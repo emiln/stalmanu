@@ -1,5 +1,7 @@
 # Richardo "GNU/dad" Stalmanu
 
+[ ![Codeship Status](https://codeship.com/projects/37a97950-a356-0132-f1db-76961affc56e/status?branch=master)](https://codeship.com/projects/66008)
+
 > I'd just like to interject for a moment. What you're referring to as Linux,
 > is in fact, GNU/Linux, or as I've recently taken to calling it, GNU plus
 > Linux. Linux is not an operating system unto itself, but rather another free

@@ -29,12 +29,25 @@
     "GNU/Linux. All the so-called Linux distributions are really "
     "distributions of GNU/Linux."))
 
+(defn predicate-action
+  "Takes a publication, a topic, a predicate, and an action.
+  Subscribes to the given topic on the given publication and does the following
+  for every event on the topic:
+
+  * When (predicate event): perform (action)."
+  [publication topic predicate action]
+  (let [subscription (async/chan)]
+    (async/sub publication topic subscription)
+    (async/go-loop []
+      (when-let [msg (async/<! subscription)]
+        (when (predicate msg)
+          (action)
+          (recur))))))
+
 (defn start!
+  "Launches Stalmanu with the given token."
   [token]
   (let [{:keys [receive send]} (client/login! token)]
-    (async/go-loop []
-      (when-let [msg (async/<! receive)]
-        (let [text (:text (json/read-str msg :key-fn keyword))]
-          (when (interject? text)
-            (async/>! send interjection))
-          (recur))))))
+    (predicate-action
+      receive "message" #(interject? (:text %))
+      (fn [] (async/go (async/>! send interjection))))))

@@ -2,9 +2,8 @@
   (:require [expectations   :refer [expect]]
             [stalmanu.logic :refer [interject?]]))
 
-;; We don't want Stalmanu spamming the channel, so we require every one of the
-;; following to fail.
-
+;; Ensure that only appropriate and educational notices about GNU plus Linux
+;; make it onto our channels.
 (expect false
   (interject? "You should be allowed to say GNU/Linux"))
 (expect false

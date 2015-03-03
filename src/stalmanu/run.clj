@@ -41,8 +41,8 @@
     (async/go-loop []
       (when-let [msg (async/<! subscription)]
         (when (predicate msg)
-          (action)
-          (recur))))))
+          (action))
+        (recur)))))
 
 (defn start!
   "Launches Stalmanu with the given token."

@@ -1,4 +1,5 @@
 (ns stalmanu.run
+  (:gen-class)
   (:require
     [clojure.core.async :as async]
     [clojure.data.json :as json]
@@ -28,3 +29,7 @@
     (predicate-action
       receive "message" #(interject? (:text %))
       (fn [msg] (interject! send msg)))))
+
+(defn -main [& args]
+  (start! (first args)))
+

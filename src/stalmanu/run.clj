@@ -51,3 +51,6 @@
     (predicate-action
       receive "message" #(interject? (:text %))
       (fn [] (async/go (async/>! send interjection))))))
+
+(defn -main [& args]
+  (start! (first args)))

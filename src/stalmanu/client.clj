@@ -6,6 +6,31 @@
     [org.httpkit.client :as http]
     [gniazdo.core :as ws]))
 
+(def ^:private publisher (async/chan))
+(def ^:private publication (async/pub publisher :type))
+
+(defn emit!
+  "Emits a message to handlers. The message is expected to be a map with the
+  key :type present as this is used as topic. If no such key is found, a
+  horrible exception will be thrown and everyone will be sad."
+  [message]
+  (when-not (map? message)
+    (throw (Exception. (str "emit! should be called with a map containing "
+                            ":type. Actual value: " (pr-str message)))))
+  (async/put! publisher message))
+
+(defn handle
+  "Subscribes an event handler for the given topic. The handler will be called
+  whenever an event is emitted for the given topic, and any optional args from
+  emit! will be passed as arguments to the handler-fn."
+  [topic handler-fn]
+  (let [c (async/chan)]
+    (async/sub publication topic c)
+    (async/go-loop []
+      (when-let [msg (async/<! c)]
+        (handler-fn msg)
+        (recur)))))
+
 (defn client!
   "Connects to the given websocket URL and returns a map of
   :socket - the open websocket
@@ -13,16 +38,10 @@
             type is String and the most popular topic will probably be
             'message'."
   [url]
-  (let [publisher   (async/chan)
-        publication (async/pub publisher :type)
-        socket (ws/connect
-                 url
-                 :on-receive (fn [raw]
-                               (async/go
-                                 (->> (json/read-str raw :key-fn keyword)
-                                   (async/>! publisher)))))]
-    {:socket socket
-     :pub publication}))
+  (ws/connect
+    url
+    :on-receive (fn [raw]
+                  (emit! (json/read-str raw :key-fn keyword)))))
 
 (def ^:private counter (atom 0))
 
@@ -41,18 +60,10 @@
   :receive - A publication by topic. See (client!).
   :send    - A channel to push message text to."
   [token]
-  (let [send (async/chan)
-        {:keys [socket pub]}
-        (-> (str "https://slack.com/api/rtm.start?token=" token)
-              (http/get)
-              (deref)
-              :body
-              (json/read-str :key-fn keyword)
-              :url
-              (client!))]
-    (async/go-loop []
-      (when-let [msg (async/<! send)]
-        (send! socket msg)
-        (recur)))
-    {:receive pub
-     :send send}))
+  (-> (str "https://slack.com/api/rtm.start?token=" token)
+        (http/get)
+        (deref)
+        :body
+        (json/read-str :key-fn keyword)
+        :url
+        (client!)))

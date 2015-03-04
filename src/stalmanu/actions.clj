@@ -26,8 +26,15 @@
     "GNU/Linux. All the so-called Linux distributions are really "
     "distributions of GNU/Linux."))
 
-(def interjection-light
-  "It's GNU plus Linux.")
+(defn interjection-light
+  []
+  (let [objection (rand-nth ["" "It's not Linux. " "No! " "Wrong! " "Incorrect! " "Stop! "])
+        combiner (rand-nth [" plus " "+" "/" " and " " with "])
+        rant (rand-nth ["%sIt is GNU%sLinux."
+                        "%sYou should call it GNU%sLinux."
+                        "%sHere in Dongers Inc. we prefer GNU%sLinux."
+                        "%sCall it GNU%sLinux instead."])]
+    (format rant objection combiner)))
 
 (def last-interjection
   (atom 0))
@@ -39,4 +46,4 @@
           (do
             (>! chan interjection)
             (reset! last-interjection (System/currentTimeMillis)))
-          (>! chan interjection-light)))))
+          (>! chan (interjection-light))))))

@@ -1,4 +1,5 @@
 (ns stalmanu.run
+  (:gen-class)
   (:require
     [clojure.core.async :as async]
     [clojure.data.json :as json]

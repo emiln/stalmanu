@@ -1,6 +1,7 @@
 (ns stalmanu.actions
   (:require [clojure.core.async :refer [>! go]]
-            [clojure.core.cache :as c]))
+            [clojure.core.cache :as c]
+            [stalmanu.client :refer [send!]]))
 
 (def interjection
   (str "I'd just like to interject for a moment. What you're referring to as "
@@ -40,10 +41,10 @@
   (atom 0))
 
 (defn interject!
-  [chan msg]
+  [websocket]
   (go (let [passed (- (System/currentTimeMillis) @last-interjection)]
         (if (> passed 600000)
           (do
-            (>! chan interjection)
+            (send! websocket interjection)
             (reset! last-interjection (System/currentTimeMillis)))
-          (>! chan (interjection-light))))))
+          (send! websocket (interjection-light))))))

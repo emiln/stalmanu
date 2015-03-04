@@ -18,7 +18,7 @@
   "Builds an uberjar of this project that can be run with java -jar"
   []
   (comp
-   (aot :all)
+   (aot :namespace '#{stalmanu.run})
    (pom :project 'stalmanu
         :version "0.1.0")
    (uber)

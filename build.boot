@@ -13,3 +13,13 @@
   []
   (set-env! :source-paths #(conj % "test"))
   (use 'logic-test))
+
+(deftask build
+  "Builds an uberjar of this project that can be run with java -jar"
+  []
+  (comp
+   (aot :all)
+   (pom :project 'stalmanu
+        :version "0.1.0")
+   (uber)
+   (jar :main 'stalmanu.run)))

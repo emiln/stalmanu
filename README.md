@@ -26,3 +26,17 @@
 Stalmanu is a rather opinionated Slack bot. His hobbies include just
 interjecting for a moment, and... well that's about it. This is mostly an
 experiment in interfacing with Slack.io.
+
+You can compile Stalmanu into a runnable jar using
+
+```bash
+boot build
+```
+
+and then start him using
+
+```bash
+java -jar target/stalmanu-0.1.0.jar my-super-secret-token
+```
+
+where you supply the Slack bot token.

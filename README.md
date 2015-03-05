@@ -23,6 +23,8 @@
 > is basically GNU with Linux added, or GNU/Linux. All the so-called Linux
 > distributions are really distributions of GNU/Linux.
 
+## Installing and running
+
 Stalmanu is a rather opinionated Slack bot. His hobbies include just
 interjecting for a moment, and... well that's about it. This is mostly an
 experiment in interfacing with Slack.io. Stalmanu uses
@@ -42,3 +44,46 @@ java -jar target/stalmanu-0.1.0.jar my-super-secret-token
 ```
 
 where you supply the Slack bot token.
+
+## Extending
+
+Stalmanu is most easily extended by hooking into the `emit!` and `handle` flow
+that his current functions are built on. Essentially, whenever anything happens
+on the channels that Stalmanu is monitoring, he will call `(emit!)` and supply
+a topic and some data:
+
+```clojure
+(emit! "message"
+  {:type "message" :channel "..." :user "..." :ts "..." :text "Hi, friends!"})
+```
+
+The topic will match the `:type` from the parsed JSON if present. You can emit
+events as well, supplying whatever topic and data you want to. To actually
+process events, you'll define some handlers:
+
+```clojure
+(handle "message"
+  (fn [msg]
+    (when (> (count (:text msg)) 500)
+      (send! websocket "Woah! That's a lot of text, mate."))))
+
+(handle "presence_change"
+  (fn [presence]
+    (println (:user presence) "is now" (:presence presence) "!")))
+```
+
+This assumes you've saved the `websocket` returned when calling `client!`.
+That's probably what you want, though, as it's the only way to send messages
+to the Slack server.
+
+It is perfectly acceptable for your handlers to emit additional events, but you
+probably want to condition them in a way that doesn't lead to infinite loops.
+You should also remember that calling `send!` will result in a new `emit!`,
+which makes creating an infinite loop simple:
+
+```clojure
+;; Don't do this unless your goal is to be kicked from the server for flooding.
+(handle "message"
+  (fn [msg]
+    (send! websocket "I just saw '" (pr-str msg) "'!")))
+```

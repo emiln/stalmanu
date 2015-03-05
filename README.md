@@ -25,7 +25,9 @@
 
 Stalmanu is a rather opinionated Slack bot. His hobbies include just
 interjecting for a moment, and... well that's about it. This is mostly an
-experiment in interfacing with Slack.io.
+experiment in interfacing with Slack.io. Stalmanu uses
+[Boot](http://boot-clj.com/), which will be assumed installed in the remainder
+of the README.
 
 You can compile Stalmanu into a runnable jar using
 

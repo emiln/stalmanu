@@ -35,9 +35,7 @@
   "Connects to the given websocket URL and returns the open socket. This socket
   is used to send messages back to the network and should in most circumstances
   be kept. The client will immediately start emitting events, so you may want
-  to set up your handlers prior to starting the client.
-  
-  Takes as argument to websocket URL to connect to."
+  to set up your handlers prior to starting the client."
   [url]
   (ws/connect
     url

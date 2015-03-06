@@ -32,11 +32,12 @@
         (recur)))))
 
 (defn client!
-  "Connects to the given websocket URL and returns a map of
-  :socket - the open websocket
-  :pub    - a publication onto which events on Slack are pushed. The topic
-            type is String and the most popular topic will probably be
-            'message'."
+  "Connects to the given websocket URL and returns the open socket. This socket
+  is used to send messages back to the network and should in most circumstances
+  be kept. The client will immediately start emitting events, so you may want
+  to set up your handlers prior to starting the client.
+  
+  Takes as argument to websocket URL to connect to."
   [url]
   (ws/connect
     url
@@ -47,7 +48,9 @@
 
 (defn send!
   "Sends a message to the Slack server, generating id as necessary. Currently
-  just sends to the 'General' channel."
+  just sends to the 'General' channel.
+  
+  Takes as argument the open websocket to the server and a String as message."
   [websocket message]
   (let [msg {:id (swap! counter inc)
              :type "message"
@@ -56,9 +59,7 @@
     (ws/send-msg websocket (json/write-str msg))))
 
 (defn login!
-  "Connects to Slack given a token and returns a map of
-  :receive - A publication by topic. See (client!).
-  :send    - A channel to push message text to."
+  "Connects to Slack given a token and returns the socket connection."
   [token]
   (-> (str "https://slack.com/api/rtm.start?token=" token)
         (http/get)

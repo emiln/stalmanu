@@ -1,9 +1,7 @@
-(ns stalmanu.actions
-  (:require [clojure.core.async :refer [>! go]]
-            [clojure.core.cache :as c]
-            [stalmanu.client :refer [send!]]))
+(ns stalmanu.rants)
 
-(def interjection
+(defn full
+  []
   (str "I'd just like to interject for a moment. What you're referring to as "
     "Linux is in fact GNU/Linux, or as I've recently taken to calling it, GNU "
     "plus Linux. Linux is not an operating system unto itself, but rather "
@@ -27,7 +25,7 @@
     "GNU/Linux. All the so-called Linux distributions are really "
     "distributions of GNU/Linux."))
 
-(defn interjection-light
+(defn light
   []
   (let [objection (rand-nth ["" "It's not Linux. " "No! " "Wrong! " "Incorrect! " "Stop! "])
         combiner (rand-nth [" plus " "+" "/" " and " " with "])
@@ -36,15 +34,3 @@
                         "%sHere in Dongers Inc. we prefer GNU%sLinux."
                         "%sCall it GNU%sLinux instead."])]
     (format rant objection combiner)))
-
-(def last-interjection
-  (atom 0))
-
-(defn interject!
-  [websocket]
-  (go (let [passed (- (System/currentTimeMillis) @last-interjection)]
-        (if (> passed 600000)
-          (do
-            (send! websocket interjection)
-            (reset! last-interjection (System/currentTimeMillis)))
-          (send! websocket (interjection-light))))))

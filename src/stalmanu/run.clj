@@ -1,20 +1,25 @@
 (ns stalmanu.run
   (:gen-class)
   (:require
-    [clojure.core.async :as async]
-    [clojure.data.json :as json]
-    [stalmanu.actions :refer [interject!]]
-    [stalmanu.client :as client]
-    [stalmanu.logic :refer [interject?]]))
+    [slacker.client :refer [handle emit!]]
+    [stalmanu.logic :refer [interject?]]
+    [stalmanu.rants :refer [full light]]))
 
-(defn start!
-  "Launches Stalmanu with the given token."
-  [token]
-  (let [socket (client/login! token)]
-    (client/handle "message"
-      (fn [msg]
-        (when (interject? msg)
-          (interject! socket))))))
+(def interval 1800000)
 
-(defn -main [& args]
-  (start! (first args)))
+(def next-message (atom (+ interval (System/currentTimeMillis))))
+
+(handle :message
+  (fn [{:keys [text]}]
+    (when (interject? text)
+      (let [now (System/currentTimeMillis)]
+        (if (> now @next-message)
+          (do
+            (emit! :slacker.client/send-message (full))
+            (reset! next-message (+ now interval)))
+          (emit! :slacker.client/send-message (light)))))))
+
+(defn -main
+  [& [token]]
+  (println "Connecting with token" token)
+  (emit! :slacker.client/connect-bot token))

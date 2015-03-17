@@ -1,36 +1,26 @@
-(ns stalmanu.rants)
+(ns stalmanu.rants
+  (:require [clojure.java.io :refer [reader]]
+            [clojure.string :refer [join]]))
+
+(defn- read-and-format
+  [file-name & args]
+  (with-open [file (reader (str "resources/rants/" file-name ".txt"))]
+    (apply format (rand-nth (line-seq file)) args)))
 
 (defn full
-  []
-  (str "I'd just like to interject for a moment. What you're referring to as "
-    "Linux is in fact GNU/Linux, or as I've recently taken to calling it, GNU "
-    "plus Linux. Linux is not an operating system unto itself, but rather "
-    "another free component of a fully functioning GNU system made useful by "
-    "the GNU corelibs, shell utilities and vital system components comprising "
-    "a full OS as defined by POSIX.\n\n"
-
-    "Many computer users run a modified version of the GNU system every day, "
-    "without realizing it. Through a peculiar turn of events, the version of "
-    "GNU which is widely used today is often called Linux, and many of its "
-    "users are not aware that it is basically the GNU system, developed by "
-    "the GNU Project.\n\n"
-
-    "There really is a Linux, and these people are using it, but it is just a "
-    "part of the system they use. Linux is the kernel: the program in the "
-    "system that allocates the machine's resources to the other programs that "
-    "you run. The kernel is an essential part of an operating system, but "
-    "useless by itself; it can only function in the context of a complete "
-    "operating system. Linux is normally used in combination with the GNU "
-    "operating system: the whole system is basically GNU with Linux added, or "
-    "GNU/Linux. All the so-called Linux distributions are really "
-    "distributions of GNU/Linux."))
+  "Inserts a reference to user-id into the full rant and returns the rant as a
+  string."
+  [user-id]
+  (with-open [rdr (reader "resources/rants/full.txt")]
+    (->> (line-seq rdr)
+      (join "\n\n")
+      (#(format % (str "<@" user-id ">"))))))
 
 (defn light
-  []
-  (let [objection (rand-nth ["" "It's not Linux. " "No! " "Wrong! " "Incorrect! " "Stop! "])
-        combiner (rand-nth [" plus " "+" "/" " and " " with "])
-        rant (rand-nth ["%sIt is GNU%sLinux."
-                        "%sYou should call it GNU%sLinux."
-                        "%sHere in Dongers Inc. we prefer GNU%sLinux."
-                        "%sCall it GNU%sLinux instead."])]
-    (format rant objection combiner)))
+  "Generates a random light rant and inserts a reference to user-id in it.
+  Returns the rant as a string."
+  [user-id]
+  (let [part1 (read-and-format "light-01" (str "<@" user-id ">"))
+        split (read-and-format "light-02")
+        part2 (read-and-format "light-03" split)]
+    (join " " [part1 part2])))

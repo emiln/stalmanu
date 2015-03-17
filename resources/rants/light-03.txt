@@ -1,0 +1,4 @@
+It is GNU%sLinux.
+You should call it GNU%sLinux.
+Here in Dongers Inc. we prefer GNU%sLinux.
+Call it GNU%sLinux instead.

@@ -1,0 +1,7 @@
+%s:
+It's not Linux, %s.
+No, %s!
+Wrong, %s!
+Incorrect, %s!
+Stop, %s!
+Bad %s!

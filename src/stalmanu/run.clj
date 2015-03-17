@@ -1,6 +1,7 @@
 (ns stalmanu.run
   (:gen-class)
   (:require
+    [clojure.core.async :refer [<!! chan]]
     [slacker.client :refer [handle emit!]]
     [stalmanu.logic :refer [interject?]]
     [stalmanu.rants :refer [full light]]))
@@ -9,17 +10,19 @@
 
 (def next-message (atom (+ interval (System/currentTimeMillis))))
 
-(handle :message
-  (fn [{:keys [text]}]
-    (when (interject? text)
-      (let [now (System/currentTimeMillis)]
-        (if (> now @next-message)
-          (do
-            (emit! :slacker.client/send-message (full))
-            (reset! next-message (+ now interval)))
-          (emit! :slacker.client/send-message (light)))))))
+(defn interject!
+  [{:keys [user text]}]
+  (when (interject? text)
+    (let [now (System/currentTimeMillis)]
+      (if (> now @next-message)
+        (do
+          (emit! :slacker.client/send-message (full user))
+          (reset! next-message (+ now interval)))
+        (emit! :slacker.client/send-message (light user))))))
 
 (defn -main
   [& [token]]
+  (handle :message interject!)
   (println "Connecting with token" token)
-  (emit! :slacker.client/connect-bot token))
+  (emit! :slacker.client/connect-bot token)
+  (<!! (chan)))

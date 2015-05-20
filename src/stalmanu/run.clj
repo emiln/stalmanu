@@ -1,7 +1,8 @@
 (ns stalmanu.run
   (:gen-class)
   (:require
-    [clojure.core.async :refer [<!! chan]]
+    [clojure.core.async :refer [<!! timeout]]
+    [clojure.tools.logging :refer [info]]
     [slacker.client :refer [handle emit!]]
     [stalmanu.logic :refer [interject?]]
     [stalmanu.rants :refer [full light]]))
@@ -25,4 +26,6 @@
   (handle :message interject!)
   (println "Connecting with token" token)
   (emit! :slacker.client/connect-bot token)
-  (<!! (chan)))
+  (loop []
+    (<!! (timeout 1000))
+    (recur)))

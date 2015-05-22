@@ -1,10 +1,10 @@
 (set-env!
   :source-paths #{"src"}
   :dependencies '[[adzerk/boot-test "1.0.4" :scope "test"]
+                  [emiln/slacker "1.2.0"]
                   [org.clojure/clojure "1.7.0-RC1"]
                   [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                   [org.clojure/data.json "0.2.5"]
-                  [emiln/slacker "1.2.0"]
                   [stylefruits/gniazdo "0.3.1"]])
 
 (deftask build

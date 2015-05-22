@@ -1,18 +1,15 @@
 (ns logic-test
-  (:require [expectations   :refer [expect]]
+  (:require [clojure.test :refer [are deftest is testing]]
             [stalmanu.logic :refer [interject?]]))
 
-;; Ensure that only appropriate and educational notices about GNU plus Linux
-;; make it onto our channels.
-(expect false
-  (interject? "You should be allowed to say GNU/Linux"))
-(expect false
-  (interject? "And definitely also GNU+Linux"))
-(expect false
-  (interject? "Hell, even GNU and Linux should be fine."))
-(expect false
-  (interject? "More creative phrases like 'gnu-infested linux' should work."))
-(expect false
-  (interject? "Mentioning the Linux kernel should also be dandy."))
-(expect false
-  (interject? "As far as kernels go, Linux is pretty good."))
+(deftest about-interjections
+  (testing "Facts about injections"
+    (testing "only appropriate and educational notices about GNU plus Linux make
+             it onto our channels."
+      (are [text] (false? (interject? text))
+        "You should be allowed to say GNU/Linux"
+        "And definitely also GNU+Linux"
+        "Hell, even GNU and Linux should be fine."
+        "More creative phrases like 'gnu-infested linux' should work."
+        "Mentioning the Linux kernel should also be dandy."
+        "As far as kernels go, Linux is pretty good."))))

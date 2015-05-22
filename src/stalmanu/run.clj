@@ -27,5 +27,5 @@
   (println "Connecting with token" token)
   (emit! :slacker.client/connect-bot token)
   (loop []
-    (<!! (timeout 1000))
+    (<!! (timeout 10000))
     (recur)))
